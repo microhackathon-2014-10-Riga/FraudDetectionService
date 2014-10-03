@@ -27,12 +27,16 @@ class FraudController {
             @PathVariable @NotNull String loanApplicationId,
             @RequestBody @Valid LoanApplication loanApplication, BindingResult bindingResult) {
 
+        final ResponseEntity<Object> responseEntity;
+        
         if (bindingResult.hasErrors()) {
-            return new ResponseEntity<Object>(HttpStatus.NOT_ACCEPTABLE);
-        }
-
+            responseEntity = new ResponseEntity<Object>(HttpStatus.NOT_ACCEPTABLE);
+        } else {
+            responseEntity = new ResponseEntity<Object>(HttpStatus.OK);
+        }   
+        
         //call decision maker
 
-        new ResponseEntity<Object>(HttpStatus.OK);
+        return responseEntity;
     }
 }
