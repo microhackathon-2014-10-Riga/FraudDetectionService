@@ -49,8 +49,8 @@ class FraudService {
     boolean isClientFishy(LoanApplication loanApplication) {
         return JobPosition.FINANCE_SECTOR.getName().equalsIgnoreCase(loanApplication.job) &&
                 loanApplication.age > MAX_AGE &&
-                loanApplication.amount > MIN_AMOUNT &&
-                loanApplication.amount < MAX_AMOUNT &&
+                loanApplication.amount > FIRST_THRESHOLD &&
+                loanApplication.amount < SECOND_THRESHOLD &&
                 isCustomerNameFinance(loanApplication.firstName, loanApplication.lastName)
     }
 
