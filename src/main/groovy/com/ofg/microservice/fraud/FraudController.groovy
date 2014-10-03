@@ -55,7 +55,7 @@ class FraudController {
                                                                         lastName: loanApplication.lastName, 
                                                                         job: loanApplication.job, 
                                                                         amount: loanApplication.amount, 
-                                                                        text: "This Client is fishy")
+                                                                        text: FraudStatus.FISHY.toString())
 
         serviceRestClient.forService("decision-maker").
                 put().
