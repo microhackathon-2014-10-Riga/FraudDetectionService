@@ -36,11 +36,11 @@ ext {
 
 uploadArchives {
     repositories.mavenDeployer {
-        repository(url: "http://nexus.4finance.net/content/repositories/Pipeline") {
-            authentication(userName: '', password: '')
+        repository(url: "http://nexus.hackathon.dev.4finance.net:8081/nexus/content/repositories/releases/") {
+            authentication(userName: 'admin', password: 'admin123')
         }
         pom.version = currentVersion
-        pom.artifactId = project.name
+        pom.artifactId = 'fraud-detection-service'
         pom.groupId = 'com.ofg'
     }
 }
