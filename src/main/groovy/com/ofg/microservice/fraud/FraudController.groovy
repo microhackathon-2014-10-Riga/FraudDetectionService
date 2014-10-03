@@ -33,7 +33,7 @@ class FraudController {
             responseEntity = new ResponseEntity<Object>(HttpStatus.NOT_ACCEPTABLE);
         } else {
             responseEntity = new ResponseEntity<Object>(HttpStatus.OK);
-        }
+        }   
         
         //call decision maker
 
