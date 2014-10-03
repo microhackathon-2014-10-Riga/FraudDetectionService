@@ -1,5 +1,5 @@
 package com.ofg.microservice.fraud
-
+import com.codahale.metrics.MetricRegistry
 import com.ofg.infrastructure.web.resttemplate.fluent.ServiceRestClient
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -12,16 +12,25 @@ import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
 
+import com.codahale.metrics.Timer
+
 @Slf4j
 @RestController
 @RequestMapping('/api')
 class FraudController {
 
-    @Autowired
-    FraudService fraudService;
+    private final FraudService fraudService;
+    private final ServiceRestClient serviceRestClient;
+    
+    private Timer.Context context;
 
     @Autowired
-    ServiceRestClient serviceRestClient;
+    FraudController(FraudService fraudService, ServiceRestClient serviceRestClient, MetricRegistry metricRegistry) {
+        this.fraudService = fraudService;
+        this.serviceRestClient = serviceRestClient;
+
+        context = metricRegistry.timer("fraud-detection-service-timer").time();
+    }
 
     @RequestMapping(value = "/loanApplication/{loanApplicationId}",
             method = RequestMethod.PUT,
@@ -46,16 +55,17 @@ class FraudController {
             }
         }
 
+        context.stop();
         return responseEntity;
     }
 
     String informDecisionMaker(String loanApplicationId, LoanApplication loanApplication) {
 
-        LoanApplicationDecision decision = new LoanApplicationDecision(firstName: loanApplication.firstName, 
-                                                                        lastName: loanApplication.lastName, 
-                                                                        job: loanApplication.job, 
-                                                                        amount: loanApplication.amount, 
-                                                                        text: FraudStatus.FISHY.toString())
+        LoanApplicationDecision decision = new LoanApplicationDecision(firstName: loanApplication.firstName,
+                lastName: loanApplication.lastName,
+                job: loanApplication.job,
+                amount: loanApplication.amount,
+                text: FraudStatus.FISHY.toString())
 
         serviceRestClient.forService("decision-maker").
                 put().
