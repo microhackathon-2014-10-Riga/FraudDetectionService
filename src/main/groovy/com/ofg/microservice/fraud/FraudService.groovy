@@ -8,13 +8,10 @@ import org.springframework.stereotype.Service
 @Service
 class FraudService {
     
-    private final String JOB_POSITION_OTHER = 'OTHER' 
-    private final String JOB_POSITION_FINANCE_SECTOR = 'FINANCE SECTOR' 
-    private final String JOB_POSITION_IT = 'IT' 
     private final Integer MIN_AGE = 18 
     private final Integer MAX_AGE = 65
-    private final BigDecimal MIN_AMOUNT = 1000
-    private final BigDecimal MAX_AMOUNT = 2000
+    private final BigDecimal FIRST_THRESHOLD = 1000
+    private final BigDecimal SECOND_THRESHOLD = 2000
 
     FraudStatus checkLoanApplication(LoanApplication loanApplication) {
 
@@ -27,27 +24,31 @@ class FraudService {
             status = FraudStatus.OK
         }
         
-        return status;
+        return status
     }
     
     boolean isClientFraud(LoanApplication loanApplication) {
-        return JOB_POSITION_OTHER.equals(loanApplication.job) && 
+        return JobPosition.OTHER.getName().equalsIgnoreCase(loanApplication.job) && 
                 loanApplication.age < MIN_AGE && 
-                loanApplication.amount > MAX_AMOUNT && 
-                isCustomerNameFraud(loanApplication.firstName, loanApplication.lastName)
+                isAmountGreaterThanSecondThreshold(loanApplication) &&
+                isClientNameTooShort(loanApplication)
+    }
+    
+    boolean isAmountGreaterThanSecondThreshold(LoanApplication loanApplication) {
+        return loanApplication.amount > SECOND_THRESHOLD
+    }
+    
+    boolean isClientNameTooShort(LoanApplication loanApplication) {
+        return loanApplication.firstName.length() < 2 ||
+                loanApplication.lastName() < 2
     }
     
     boolean isClientFishy(LoanApplication loanApplication) {
-        //TODO to be implemented
+        return JobPosition.FINANCE_SECTOR.getName().equalsIgnoreCase(loanApplication.job) &&
+                loanApplication.age > MAX_AGE &&
+                loanApplication.amount > MIN_AMOUNT &&
+                loanApplication.amount < MAX_AMOUNT &&
+                isCustomerNameFinance(loanApplication.firstName, loanApplication.lastName)
     }
-    
-    boolean isClientOK(LoanApplication loanApplication) {
-        //TODO to be implemented
-    }
-    
-    boolean isCustomerNameOK(String firstName, String lastName) {
-        //TODO to be implemented
-    }
-    
     
 }

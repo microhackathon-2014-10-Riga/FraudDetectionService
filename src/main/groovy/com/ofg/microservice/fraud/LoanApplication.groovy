@@ -20,5 +20,5 @@ class LoanApplication {
     BigDecimal amount
     
     @Range
-    Integer number
+    Integer age
 }
