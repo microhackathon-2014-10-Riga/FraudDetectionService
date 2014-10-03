@@ -1,5 +1,6 @@
 package com.ofg.microservice.fraud
 
+import com.ofg.infrastructure.web.resttemplate.fluent.ServiceRestClient
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -18,6 +19,9 @@ class FraudController {
 
     @Autowired
     FraudService fraudService;
+    
+    @Autowired
+    ServiceRestClient serviceRestClient;
 
     @RequestMapping(value = "/loanApplication/{loanApplicationId}",
             method = RequestMethod.PUT,
@@ -28,11 +32,29 @@ class FraudController {
             @RequestBody @Valid LoanApplication loanApplication, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
-            return new ResponseEntity<Object>(HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<Object>(HttpStatus.NOT_ACCEPTABLE)
         }
 
-        //call decision maker
+        if(fraudService.checkLoanApplication(loanApplication).is(FraudStatus.FISHY)) {
+            String statusCode = informDecisionMaker(loanApplicationId, loanApplication)
+            if (statuCode.'2xxSuccessful') {
+                return new ResponseEntity<Object>(HttpStatus.SERVICE_UNAVAILABLE)
+            }
+        }
 
-        new ResponseEntity<Object>(HttpStatus.OK);
+        new ResponseEntity<Object>(HttpStatus.OK)
+    }
+    
+    String informDecisionMaker(String loanApplicationId, LoanApplication loanApplication) {
+        serviceRestClient.forService("decision-maker").
+                         put().
+                         onUrl("/api/loanApplication/" + loanApplication).
+                         body(loanApplication).
+                         withHeaders().
+                            contentTypeJson().
+                         andExecuteFor().
+                         aResponseEntity().
+                         ofType(Object).statusCode
+                            
     }
 }
