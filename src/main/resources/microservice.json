@@ -2,6 +2,7 @@
     "europe": {
         "this": "lt/microhackathon/fraud-detection-service",
         "dependencies": {
+            "decision-maker": "lt/microhackathon/decision-maker"
         }
     }
 }
