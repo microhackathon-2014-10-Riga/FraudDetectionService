@@ -36,6 +36,21 @@ class FraudService {
                 isAmountGreaterThanSecondThreshold(loanApplication) &&
                 isClientNameTooShort(loanApplication)
     }
+
+    boolean isClientFishy(LoanApplication loanApplication) {
+        return JobPosition.FINANCE_SECTOR.getName().equalsIgnoreCase(loanApplication.job) &&
+                loanApplication.age > MAX_AGE &&
+                isAmountBetweenThresholds(loanApplication) &&
+                isClientNameTooLong(loanApplication.firstName, loanApplication.lastName)
+    }
+
+    boolean isClientOK(LoanApplication loanApplication) {
+        return JobPosition.IT.getName().equalsIgnoreCase(loanApplication.job) &&
+                loanApplication.age > MIN_AGE &&
+                loanApplication.age < MAX_AGE &&
+                isAmountLessThanFirstThreshold(loanApplication) &&
+                isClientNameOk(loanApplication)
+    }    
     
     boolean isAmountGreaterThanSecondThreshold(LoanApplication loanApplication) {
         return loanApplication.amount > SECOND_THRESHOLD
@@ -53,21 +68,6 @@ class FraudService {
     boolean isClientNameTooLong(LoanApplication loanApplication) {
         return loanApplication.firstName.length() > 25 ||
                 loanApplication.lastName() < 25
-    }
-    
-    boolean isClientFishy(LoanApplication loanApplication) {
-        return JobPosition.FINANCE_SECTOR.getName().equalsIgnoreCase(loanApplication.job) &&
-                loanApplication.age > MAX_AGE &&
-                isAmountBetweenThresholds(loanApplication) &&
-                isClientNameTooLong(loanApplication.firstName, loanApplication.lastName)
-    }
-
-    boolean isClientOK(LoanApplication loanApplication) {
-        return JobPosition.IT.getName().equalsIgnoreCase(loanApplication.job) &&
-                loanApplication.age > MIN_AGE &&
-                loanApplication.age < MAX_AGE &&
-                isAmountLessThanFirstThreshold(loanApplication) &&
-                isClientNameOk(loanApplication)
     }
     
     boolean isAmountLessThanFirstThreshold(LoanApplication loanApplication) {
