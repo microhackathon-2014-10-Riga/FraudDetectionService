@@ -8,10 +8,13 @@ import org.springframework.stereotype.Service
 @Service
 class FraudService {
     
-    private final Integer MIN_AGE = 18 
-    private final Integer MAX_AGE = 65
-    private final BigDecimal FIRST_THRESHOLD = 1000
-    private final BigDecimal SECOND_THRESHOLD = 2000
+    private static final Integer MIN_AGE = 18 
+    private static final Integer MAX_AGE = 65
+    private static final BigDecimal FIRST_THRESHOLD = 1000
+    private static final BigDecimal SECOND_THRESHOLD = 2000
+    private static final Integer MIN_NAME_LENGTH = 2
+    private static final Integer MAX_NAME_LENGTH = 25
+   
 
     FraudStatus checkLoanApplication(LoanApplication loanApplication) {
 
@@ -52,7 +55,20 @@ class FraudService {
     }
 
     boolean isClientOK(LoanApplication loanApplication) {
-        return false
+        return JobPosition.IT.getName().equalsIgnoreCase(loanApplication.job) &&
+                loanApplication.age > MIN_AGE &&
+                loanApplication.age < MAX_AGE &&
+                isAmountLessThanFirstThreshold(loanApplication) &&
+                isClientNameOk(loanApplication)
+    }
+    
+    boolean isAmountLessThanFirstThreshold(LoanApplication loanApplication) {
+        return loanApplication.amount < FIRST_THRESHOLD
+    }
+    
+    boolean isClientNameOk(LoanApplication loanApplication) {
+        return (loanApplication.firstName > MIN_NAME_LENGTH && loanApplication.firstName < MAX_NAME_LENGTH) ||
+                (loanApplication.lastName > MIN_NAME_LENGTH && loanApplication.lastName < MAX_NAME_LENGTH)
     }
     
 }
