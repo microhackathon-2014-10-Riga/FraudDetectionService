@@ -19,7 +19,7 @@ class FraudController {
 
     @Autowired
     FraudService fraudService;
-    
+
     @Autowired
     ServiceRestClient serviceRestClient;
 
@@ -32,14 +32,14 @@ class FraudController {
             @RequestBody @Valid LoanApplication loanApplication, BindingResult bindingResult) {
 
         final ResponseEntity<Object> responseEntity;
-        
+
         if (bindingResult.hasErrors()) {
             responseEntity = new ResponseEntity<Object>(HttpStatus.NOT_ACCEPTABLE);
         } else {
             responseEntity = new ResponseEntity<Object>(HttpStatus.OK);
-        }   
-        
-        if(fraudService.checkLoanApplication(loanApplication).is(FraudStatus.FISHY)) {
+        }
+
+        if (fraudService.checkLoanApplication(loanApplication).is(FraudStatus.FISHY)) {
             String statusCode = informDecisionMaker(loanApplicationId, loanApplication)
             if (statuCode.'2xxSuccessful') {
                 responseEntity = new ResponseEntity<Object>(HttpStatus.SERVICE_UNAVAILABLE)
@@ -48,17 +48,24 @@ class FraudController {
 
         return responseEntity;
     }
-    
+
     String informDecisionMaker(String loanApplicationId, LoanApplication loanApplication) {
+
+        LoanApplicationDecision decision = new LoanApplicationDecision(firstName: loanApplication.firstName, 
+                                                                        lastName: loanApplication.lastName, 
+                                                                        job: loanApplication.job, 
+                                                                        amount: loanApplication.amount, 
+                                                                        text: "This Client is fishy")
+
         serviceRestClient.forService("decision-maker").
-                         put().
-                         onUrl("/api/loanApplication/" + loanApplication).
-                         body(loanApplication).
-                         withHeaders().
-                            contentTypeJson().
-                         andExecuteFor().
-                         aResponseEntity().
-                         ofType(Object).statusCode
-                            
+                put().
+                onUrl("/api/loanApplication/" + loanApplication).
+                body(decision).
+                withHeaders().
+                contentTypeJson().
+                andExecuteFor().
+                aResponseEntity().
+                ofType(Object).statusCode
+
     }
 }
