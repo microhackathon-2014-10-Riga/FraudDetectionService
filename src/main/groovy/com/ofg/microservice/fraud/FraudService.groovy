@@ -50,5 +50,9 @@ class FraudService {
                 loanApplication.amount < MAX_AMOUNT &&
                 isCustomerNameFinance(loanApplication.firstName, loanApplication.lastName)
     }
+
+    boolean isClientOK(LoanApplication loanApplication) {
+        return false
+    }
     
 }
