@@ -31,18 +31,22 @@ class FraudController {
             @PathVariable @NotNull String loanApplicationId,
             @RequestBody @Valid LoanApplication loanApplication, BindingResult bindingResult) {
 
+        final ResponseEntity<Object> responseEntity;
+        
         if (bindingResult.hasErrors()) {
-            return new ResponseEntity<Object>(HttpStatus.NOT_ACCEPTABLE)
-        }
-
+            responseEntity = new ResponseEntity<Object>(HttpStatus.NOT_ACCEPTABLE);
+        } else {
+            responseEntity = new ResponseEntity<Object>(HttpStatus.OK);
+        }   
+        
         if(fraudService.checkLoanApplication(loanApplication).is(FraudStatus.FISHY)) {
             String statusCode = informDecisionMaker(loanApplicationId, loanApplication)
             if (statuCode.'2xxSuccessful') {
-                return new ResponseEntity<Object>(HttpStatus.SERVICE_UNAVAILABLE)
+                responseEntity = new ResponseEntity<Object>(HttpStatus.SERVICE_UNAVAILABLE)
             }
         }
 
-        new ResponseEntity<Object>(HttpStatus.OK)
+        return responseEntity;
     }
     
     String informDecisionMaker(String loanApplicationId, LoanApplication loanApplication) {
